@@ -1,36 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8">
     <link rel="icon" href="/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <link rel="stylesheet" href="src/assets/main.css">
-      <script defer src="src/main.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.18/vue.min.js"></script>
-      <title>Product App</title>
-  </head>
-  <body>
-  <div id="app">
-      <div class="product">
-          <div class="product-image">
-              <img :src="image" :alt="altText"/>
-          </div>
-          <div class="product-info">
-              <h1>{{ title }}</h1>
-              <p>{{ sale }}</p>
-              <p v-if="inStock">In Stock</p>
-              <p v-else style="text-decoration: line-through">Out of Stock</p>
-              <ul>
-                  <li v-for="detail in details">{{ detail }}</li>
-              </ul>
-              <div  class="color-box" v-for="variant in variants" :key="variant.variantId" :style="{ backgroundColor:variant.variantColor }" @mouseover="updateProduct(variant.variantImage)">
-              </div>
-              <div class="cart">
-                  <p>Cart({{ cart }})</p>
-              </div>
-              <button v-on:click="addToCart" :disabled="!inStock" :class="{ disabledButton: !inStock }"> Add to cart </button>
-          </div>
-      </div>
-  </div>
-  </body>
+    <link rel="stylesheet" href="src/assets/main.css">
+    <script defer src="src/main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.18/vue.min.js"></script>
+    <title>Product App</title>
+</head>
+<body>
+<div id="app">
+    <product :premium="premium"></product>
+</div>
+</body>
 </html>
