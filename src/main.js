@@ -8,9 +8,9 @@ Vue.component('product-details', {
         }
     },
     template: `
-        <ul>
-            <li v-for="detail in details">{{ detail }}</li>
-        </ul>
+      <ul>
+        <li v-for="detail in details">{{ detail }}</li>
+      </ul>
     `
 
 })
@@ -24,7 +24,7 @@ Vue.component('product-review', {
           <li v-for="error in errors">{{ error }}</li>
         </ul>
         </p>
-        
+
         <p>
           <label for="name">Name:</label>
           <input id="name" v-model="name" placeholder="name">
@@ -60,7 +60,7 @@ Vue.component('product-review', {
         </p>
 
       </form>
-      
+
     `,
     data() {
         return {
@@ -154,9 +154,9 @@ Vue.component('info-tabs', {
     },
     template: `
       <div>
-      
+
         <ul>
-          <span class="tab" 
+          <span class="tab"
                 :class="{ activeTab: selectedTab === tab }"
                 v-for="tab in tabs"
                 @click="selectedTab = tab"
@@ -172,7 +172,7 @@ Vue.component('info-tabs', {
             <li v-for="detail in details">{{ detail }}</li>
           </ul>
         </div>
-    
+
       </div>
     `,
     data() {
@@ -202,37 +202,42 @@ Vue.component('product', {
           <p v-if="inStock">In Stock</p>
           <p v-else style="text-decoration: line-through">Out of Stock</p>
           <info-tabs :shipping="shipping" :details="details"></info-tabs>
-          <ul>
-            <li v-for="size in sizes">{{ size }}</li>
-          </ul>
+          <div style="display: flex; gap: 10px">
+            <button v-for="size in sizes"  :disabled="!inStock" :class="{ disabledButton: !inStock }" :key="size" @click="updateSize(size)">{{ size }}</button>
+          </div>
           <p>{{sale}}</p>
           <p>{{ description }}</p>
-          
-          <div
-              class="color-box"
-              v-for="variant in variants"
-              :key="variant.variantId"
-              :style="{ backgroundColor:variant.variantColor }"
-              @mouseover="updateProduct(variant.variantImage)">
+
+          <div class="color-box"
+               v-for="(variant, index) in variants"
+               :key="variant.variantId"
+               :style="{ backgroundColor: variant.variantColor }"
+               @click="updateProduct(index)">
           </div>
-          <button v-on:click="addToCart" :disabled="!inStock" :class="{ disabledButton: !inStock }">Add to cart</button>
+
+          <button v-on:click="addToCart"
+                  :disabled="!inStock"
+                  :class="{ disabledButton: !inStock }"
+          >
+            Add to cart
+          </button>
           <button v-on:click="delCart" :disabled="!inStock" :class="{ disabledButton: !inStock }">Del cart</button>
         </div>
         <product-tabs :reviews="reviews"></product-tabs>
       </div>
- `,
+    `,
     data() {
         return {
             product: "Socks",
             description: " A pair of warm, fuzzy socks",
             brand: 'Vue Mastery',
+            selectedSize: null,
             selectedVariant: 0,
-            image: "src/assets/vmSocks-green-onWhite.jpg",
+            //image: "src/assets/vmSocks-green-onWhite.jpg",
             altText: "A pair of socks",
             link: "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Daps&field-keywords=socks",
             details: ['80% cotton', '20% polyester', 'Gender-neutral'],
             sizes: ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
-            inStock: true,
             variants: [
                 {
                     variantId: 2234,
@@ -254,41 +259,43 @@ Vue.component('product', {
     },
     methods: {
         addToCart() {
-            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId);
-        },
-        updateProduct(variantImage) {
-            this.image = variantImage
-        },
-        updateCart(id) {
-            this.cart.push(id);
+            if (!this.selectedVariant && this.selectedSize === "null") {
+                return false
+            } else {
+                this.$emit('add-to-cart',{ id: this.variants[this.selectedVariant].variantId, color: this.variants[this.selectedVariant].variantColor, size: this.selectedSize});
+            }
         },
         delCart() {
-            this.$emit('del-from-cart',this.variants[this.selectedVariant].variantId);
+            this.$emit('del-from-cart', this.variants[this.selectedVariant].variantId);
+        },
+        updateProduct(index) {
+            this.selectedVariant = index;
+        },
+        updateSize(size) {
+            console.log(1)
+            this.selectedSize = size;
         },
         addReview(productReview) {
             this.reviews.push(productReview)
         }
-
-
     },
     computed: {
         title() {
             return this.brand + ' ' + this.product;
         },
+        image() {
+            return this.variants[this.selectedVariant].variantImage;
+        },
+        inStock() {
+            return this.variants[this.selectedVariant].variantQuantity > 0;
+        },
+
         shipping() {
-            if (this.premium) {
-                return "Free";
-            } else {
-                return 2.99
-            }
+            return this.premium ? "Free" : "2.99";
         },
-        sale: function() {
-            if (this.onSale) {
-                return `${this.brand} ${this.product} is on sale!`
-            } else {
-                return `${this.brand} ${this.product} isn't on sale!`
-            }
-        },
+        sale() {
+            return this.onSale ? `${this.brand} ${this.product} is on sale` : `${this.brand} ${this.product} isn't on sale`;
+        }
         // image() {
         //     return this.variants[this.selectedVariant].variantImage;
         // },
@@ -310,12 +317,13 @@ let app = new Vue({
         cart: []
     },
     methods: {
-        updateCart(id) {
-            this.cart.push(id);
+        updateCart(id, color, size) {
+            this.cart.push(id, color, size);
+            console.log(this.cart)
         },
         delfromCart() {
             this.cart.shift();
         },
-
     }
 })
+
