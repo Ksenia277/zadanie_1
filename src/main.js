@@ -259,7 +259,8 @@ Vue.component('product', {
     },
     methods: {
         addToCart() {
-            if (!this.selectedVariant && this.selectedSize === "null") {
+            if (this.selectedVariant === null || this.selectedSize === null) {
+                 alert("Вы не указали размер или цвет носков")
                 return false
             } else {
                 this.$emit('add-to-cart',{ id: this.variants[this.selectedVariant].variantId, color: this.variants[this.selectedVariant].variantColor, size: this.selectedSize});
@@ -272,7 +273,6 @@ Vue.component('product', {
             this.selectedVariant = index;
         },
         updateSize(size) {
-            console.log(1)
             this.selectedSize = size;
         },
         addReview(productReview) {
@@ -317,9 +317,8 @@ let app = new Vue({
         cart: []
     },
     methods: {
-        updateCart(id, color, size) {
-            this.cart.push(id, color, size);
-            console.log(this.cart)
+        updateCart(id) {
+            this.cart.push(id);
         },
         delfromCart() {
             this.cart.shift();
